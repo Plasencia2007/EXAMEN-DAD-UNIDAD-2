@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: ms-admin-registry-server
+
+# Puerto estandar del servidor Eureka
+server:
+  port: 8761
+
+eureka:
+  client:
+    # Un Eureka Server no se registra ni descubre a si mismo
+    register-with-eureka: false
+    fetch-registry: false
+  instance:
+    hostname: localhost
+  server:
+    # Acelera el arranque en entorno local
+    enable-self-preservation: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

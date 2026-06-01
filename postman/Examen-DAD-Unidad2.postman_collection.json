@@ -1,0 +1,702 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-47a8-9b0c-examen-dad-u2",
+    "name": "Examen DAD - Unidad 2 (Academia de Talleres)",
+    "description": "Coleccion completa de los microservicios de la Academia de Talleres.\n\n**Arquitectura:** Spring Boot 3.5.14 + Spring Cloud 2025.0.2 (Eureka, Config Server, Gateway, OpenFeign).\n\nTodas las peticiones pasan por el **API Gateway** ({{gateway}} = http://localhost:8080), que enruta hacia cada microservicio registrado en Eureka.\n\n| Microservicio | Puerto | Base de datos |\n|---|---|---|\n| ms-gestion-instructor | 8081 | db_instructor |\n| ms-gestion-alumno | 8082 | db_alumno |\n| ms-gestion-taller (compuesto) | 8083 | db_taller |\n\n**Orden de arranque:** Eureka (8761) -> Config (8888) -> Gateway (8080) -> Instructor -> Alumno -> Taller.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Seguridad (Auth)",
+      "description": "Microservicio **ms-seguridad** (puerto 8084, BD `db_seguridad`). Maneja usuarios, roles y permisos, y emite tokens **JWT**.\n\nUsa `Login` o `Register`: el token devuelto se guarda automaticamente en la variable de entorno `{{token}}` y se envia como `Bearer` en todas las demas peticiones (auth heredada a nivel de coleccion).\n\nUsuario administrador creado al arrancar: **admin / admin123**.",
+      "item": [
+        {
+          "name": "Register (Alumno)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data && data.token) {",
+                  "  pm.environment.set('token', data.token);",
+                  "  console.log('Token guardado en {{token}}');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"luis\",\n  \"correo\": \"luis@correo.com\",\n  \"password\": \"alumno123\",\n  \"rol\": \"ALUMNO\",\n  \"nombres\": \"Luis\",\n  \"apellidos\": \"Gomez\",\n  \"dni\": \"70123456\",\n  \"telefono\": \"999111222\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/auth/register",
+              "host": ["{{gateway}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Registra una cuenta con rol ALUMNO y crea automaticamente su ficha en ms-gestion-alumno (requiere dni). Devuelve el JWT (se guarda en {{token}}) e idReferencia = id de la ficha."
+          },
+          "response": []
+        },
+        {
+          "name": "Register (Instructor)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data && data.token) {",
+                  "  pm.environment.set('token', data.token);",
+                  "  console.log('Token guardado en {{token}}');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"ana\",\n  \"correo\": \"ana@academia.com\",\n  \"password\": \"instru123\",\n  \"rol\": \"INSTRUCTOR\",\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Torres\",\n  \"especialidad\": \"Pintura\",\n  \"telefono\": \"987654321\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/auth/register",
+              "host": ["{{gateway}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Registra una cuenta con rol INSTRUCTOR y crea automaticamente su ficha en ms-gestion-instructor (requiere especialidad). Devuelve el JWT (se guarda en {{token}}) e idReferencia = id de la ficha."
+          },
+          "response": []
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data && data.token) {",
+                  "  pm.environment.set('token', data.token);",
+                  "  console.log('Token guardado en {{token}}');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/auth/login",
+              "host": ["{{gateway}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Inicia sesion con el administrador creado al arrancar (admin / admin123). El token se guarda en {{token}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data && data.token) {",
+                  "  pm.environment.set('token', data.token);",
+                  "  console.log('Token guardado en {{token}}');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"luis\",\n  \"password\": \"alumno123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/auth/login",
+              "host": ["{{gateway}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Inicia sesion con cualquier usuario. El token devuelto se guarda en {{token}}."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar usuarios (solo ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/usuarios",
+              "host": ["{{gateway}}"],
+              "path": ["api", "usuarios"]
+            },
+            "description": "Lista todos los usuarios. Requiere un token con rol ADMIN (inicia sesion con admin primero)."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar roles (solo ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/roles",
+              "host": ["{{gateway}}"],
+              "path": ["api", "roles"]
+            },
+            "description": "Lista los roles y sus permisos. Requiere rol ADMIN."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar permisos (solo ADMIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/permisos",
+              "host": ["{{gateway}}"],
+              "path": ["api", "permisos"]
+            },
+            "description": "Lista todos los permisos. Requiere rol ADMIN."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1. Instructores",
+      "description": "CRUD del microservicio **ms-gestion-instructor** (tabla `instructor`). Base: `/api/instructores`.",
+      "item": [
+        {
+          "name": "Listar instructores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/instructores",
+              "host": ["{{gateway}}"],
+              "path": ["api", "instructores"]
+            },
+            "description": "Devuelve la lista de todos los instructores."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar instructor por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/instructores/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "instructores", "1"]
+            },
+            "description": "Devuelve un instructor por su id. Responde 404 si no existe."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear instructor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Torres\",\n  \"especialidad\": \"Pintura\",\n  \"correo\": \"ana@academia.com\",\n  \"telefono\": \"987654321\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/instructores",
+              "host": ["{{gateway}}"],
+              "path": ["api", "instructores"]
+            },
+            "description": "Crea un instructor. Campos obligatorios: nombres, apellidos, especialidad, correo (formato email). Responde 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar instructor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Ana Maria\",\n  \"apellidos\": \"Torres\",\n  \"especialidad\": \"Acuarela\",\n  \"correo\": \"ana@academia.com\",\n  \"telefono\": \"987654321\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/instructores/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "instructores", "1"]
+            },
+            "description": "Actualiza los datos de un instructor existente."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar instructor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/instructores/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "instructores", "1"]
+            },
+            "description": "Elimina un instructor por su id. Responde 204."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Alumnos",
+      "description": "CRUD del microservicio **ms-gestion-alumno** (tabla `alumno`). Base: `/api/alumnos`.",
+      "item": [
+        {
+          "name": "Listar alumnos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/alumnos",
+              "host": ["{{gateway}}"],
+              "path": ["api", "alumnos"]
+            },
+            "description": "Devuelve la lista de todos los alumnos."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar alumno por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/alumnos/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "alumnos", "1"]
+            },
+            "description": "Devuelve un alumno por su id. Responde 404 si no existe."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar alumnos por ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/alumnos/por-ids?ids=1,2,3",
+              "host": ["{{gateway}}"],
+              "path": ["api", "alumnos", "por-ids"],
+              "query": [
+                { "key": "ids", "value": "1,2,3" }
+              ]
+            },
+            "description": "Devuelve varios alumnos por una lista de ids. Endpoint usado internamente por el microservicio de talleres (via OpenFeign)."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear alumno",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Luis\",\n  \"apellidos\": \"Gomez\",\n  \"dni\": \"70123456\",\n  \"correo\": \"luis@correo.com\",\n  \"telefono\": \"999111222\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/alumnos",
+              "host": ["{{gateway}}"],
+              "path": ["api", "alumnos"]
+            },
+            "description": "Crea un alumno. Campos obligatorios: nombres, apellidos, dni (unico), correo (formato email, unico). Responde 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar alumno",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Luis Alberto\",\n  \"apellidos\": \"Gomez\",\n  \"dni\": \"70123456\",\n  \"correo\": \"luis@correo.com\",\n  \"telefono\": \"999111222\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/alumnos/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "alumnos", "1"]
+            },
+            "description": "Actualiza los datos de un alumno existente."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar alumno",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/alumnos/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "alumnos", "1"]
+            },
+            "description": "Elimina un alumno por su id. Responde 204."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Talleres (compuesto)",
+      "description": "Microservicio **ms-gestion-taller** (tabla `taller`). Servicio COMPUESTO: consume a instructores y alumnos via OpenFeign. Base: `/api/talleres`.",
+      "item": [
+        {
+          "name": "Listar talleres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/talleres",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres"]
+            },
+            "description": "Devuelve la lista de todos los talleres."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar taller por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/talleres/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres", "1"]
+            },
+            "description": "Devuelve un taller por su id (datos propios, sin instructor ni alumnos)."
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle del taller (vista compuesta)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/talleres/1/detalle",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres", "1", "detalle"]
+            },
+            "description": "**Vista COMPUESTA**: devuelve el taller + el instructor completo (microservicio de instructores) + la lista de alumnos inscritos (microservicio de alumnos) + cupos disponibles. Todo reunido mediante OpenFeign."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear taller",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Acuarela basica\",\n  \"descripcion\": \"Taller introductorio de acuarela\",\n  \"fechaInicio\": \"2026-07-01\",\n  \"cupoMaximo\": 20,\n  \"idInstructor\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/talleres",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres"]
+            },
+            "description": "Crea un taller. Valida via OpenFeign que el instructor (idInstructor) exista. Campos obligatorios: nombre, cupoMaximo (>0), idInstructor. Responde 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar taller",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Acuarela intermedia\",\n  \"descripcion\": \"Nivel intermedio\",\n  \"fechaInicio\": \"2026-08-01\",\n  \"cupoMaximo\": 15,\n  \"idInstructor\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/talleres/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres", "1"]
+            },
+            "description": "Actualiza un taller existente (revalida el instructor)."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar taller",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/talleres/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres", "1"]
+            },
+            "description": "Elimina un taller y sus inscripciones asociadas. Responde 204."
+          },
+          "response": []
+        },
+        {
+          "name": "Inscribir alumno (proceso de negocio)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/talleres/1/inscribir/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres", "1", "inscribir", "1"]
+            },
+            "description": "Inscribe al alumno {idAlumno} en el taller {idTaller}. Valida que el alumno exista (Feign), que haya cupo disponible y que no este ya inscrito. Responde 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar inscripcion (proceso de negocio)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/talleres/1/inscribir/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "talleres", "1", "inscribir", "1"]
+            },
+            "description": "Cancela la inscripcion del alumno {idAlumno} en el taller {idTaller}. Responde 204."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Inscripciones (CRUD)",
+      "description": "CRUD explicito de la tabla `inscripcion` (dentro de ms-gestion-taller). Base: `/api/inscripciones`.",
+      "item": [
+        {
+          "name": "Listar inscripciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/inscripciones",
+              "host": ["{{gateway}}"],
+              "path": ["api", "inscripciones"]
+            },
+            "description": "Lista todas las inscripciones."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar inscripciones por taller",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/inscripciones?idTaller=1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "inscripciones"],
+              "query": [
+                { "key": "idTaller", "value": "1" }
+              ]
+            },
+            "description": "Lista las inscripciones de un taller especifico."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar inscripcion por id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/inscripciones/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "inscripciones", "1"]
+            },
+            "description": "Devuelve una inscripcion por su id. Responde 404 si no existe."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear inscripcion",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idTaller\": 1,\n  \"idAlumno\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/inscripciones",
+              "host": ["{{gateway}}"],
+              "path": ["api", "inscripciones"]
+            },
+            "description": "Crea una inscripcion. Reutiliza la regla de negocio: valida cupo, duplicados y existencia de alumno/taller (Feign). Responde 201."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar inscripcion",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idTaller\": 1,\n  \"idAlumno\": 2\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{gateway}}/api/inscripciones/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "inscripciones", "1"]
+            },
+            "description": "Actualiza una inscripcion. Revalida que el taller y el alumno existan y que no quede duplicada."
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar inscripcion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/api/inscripciones/1",
+              "host": ["{{gateway}}"],
+              "path": ["api", "inscripciones", "1"]
+            },
+            "description": "Elimina una inscripcion por su id. Responde 204."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Infraestructura (verificacion)",
+      "description": "Peticiones utiles para verificar que la infraestructura esta arriba (NO pasan por el Gateway).",
+      "item": [
+        {
+          "name": "Eureka - servicios registrados",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{eureka}}/eureka/apps",
+              "host": ["{{eureka}}"],
+              "path": ["eureka", "apps"]
+            },
+            "description": "Lista los microservicios registrados en Eureka. El panel web esta en http://localhost:8761"
+          },
+          "response": []
+        },
+        {
+          "name": "Config Server - config de instructor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{config}}/ms-gestion-instructor/default",
+              "host": ["{{config}}"],
+              "path": ["ms-gestion-instructor", "default"]
+            },
+            "description": "Muestra la configuracion que el Config Server entrega al microservicio de instructores."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    {
+      "key": "gateway",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "seguridad_directo",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
+    {
+      "key": "eureka",
+      "value": "http://localhost:8761",
+      "type": "string"
+    },
+    {
+      "key": "config",
+      "value": "http://localhost:8888",
+      "type": "string"
+    }
+  ]
+}

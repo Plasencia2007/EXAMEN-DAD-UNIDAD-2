@@ -1,0 +1,167 @@
+# ============================================================
+# Academia de Talleres - Examen DAD Unidad 2
+# Orquestacion de todos los microservicios + MySQL con Docker
+#
+# Orden de arranque (gestionado con depends_on + healthchecks):
+#   1. mysql              (base de datos)
+#   2. registry-server    (Eureka, descubrimiento)
+#   3. config-server      (configuracion centralizada)
+#   4. resto de servicios (gateway, seguridad, instructor, alumno, taller)
+#
+# Las URLs (Eureka, Config Server, MySQL) que en el codigo apuntan a
+# "localhost" se sobrescriben aqui con variables de entorno para que
+# apunten a los NOMBRES de los contenedores dentro de la red de Docker.
+# ============================================================
+
+services:
+
+  # ---------------- Base de datos MySQL ----------------
+  mysql:
+    image: mysql:8.0
+    container_name: academia-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql123
+    ports:
+      - "3307:3306"            # host 3307 -> contenedor 3306 (igual que en desarrollo)
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - academia-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------- Eureka (Registry Server) ----------------
+  registry-server:
+    build: ./ms-admin-registry-server
+    container_name: academia-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - academia-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------- Config Server ----------------
+  config-server:
+    build: ./ms-admin-config-server
+    container_name: academia-config
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-server:8761/eureka/
+    depends_on:
+      registry-server:
+        condition: service_healthy
+    ports:
+      - "8888:8888"
+    networks:
+      - academia-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  # ---------------- API Gateway ----------------
+  api-gateway:
+    build: ./ms-admin-api-gateway
+    container_name: academia-gateway
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-server:8761/eureka/
+    depends_on:
+      config-server:
+        condition: service_healthy
+      registry-server:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - academia-net
+
+  # ---------------- Microservicio de Seguridad ----------------
+  ms-seguridad:
+    build: ./ms-seguridad
+    container_name: academia-seguridad
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-server:8761/eureka/
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/db_seguridad?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8084:8084"
+    networks:
+      - academia-net
+
+  # ---------------- Microservicio de Instructores ----------------
+  ms-gestion-instructor:
+    build: ./ms-gestion-instructor
+    container_name: academia-instructor
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-server:8761/eureka/
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/db_instructor?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    networks:
+      - academia-net
+
+  # ---------------- Microservicio de Alumnos ----------------
+  ms-gestion-alumno:
+    build: ./ms-gestion-alumno
+    container_name: academia-alumno
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-server:8761/eureka/
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/db_alumno?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    networks:
+      - academia-net
+
+  # ---------------- Microservicio compuesto de Talleres ----------------
+  ms-gestion-taller:
+    build: ./ms-gestion-taller
+    container_name: academia-taller
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://registry-server:8761/eureka/
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/db_taller?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+    networks:
+      - academia-net
+
+# ---------------- Red y volumen compartidos ----------------
+networks:
+  academia-net:
+    driver: bridge
+
+volumes:
+  mysql-data:

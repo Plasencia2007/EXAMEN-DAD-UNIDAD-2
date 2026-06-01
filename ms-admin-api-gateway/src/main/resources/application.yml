@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: ms-admin-api-gateway
+  # Importa la configuracion desde el Config Server
+  config:
+    import: "optional:configserver:http://localhost:8888"
+
+# Puerto local (tambien definido en el Config Server)
+server:
+  port: 8080
+
+# Eureka (necesario para resolver las rutas lb:// hacia los microservicios)
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true

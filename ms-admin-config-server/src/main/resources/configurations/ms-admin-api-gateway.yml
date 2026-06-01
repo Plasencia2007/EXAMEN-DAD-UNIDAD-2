@@ -1,0 +1,14 @@
+# ============================================================
+# Configuracion del API GATEWAY
+# ============================================================
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # Permite rutas automaticas por nombre de servicio en Eureka
+          enabled: true
+          lower-case-service-id: true

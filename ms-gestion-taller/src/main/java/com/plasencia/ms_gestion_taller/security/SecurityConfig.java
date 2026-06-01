@@ -38,6 +38,9 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
+                        // Documentacion OpenAPI / Swagger UI: acceso libre
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                                .permitAll()
                         // Lecturas: cualquier usuario autenticado
                         .requestMatchers(HttpMethod.GET, "/api/talleres/**", "/api/inscripciones/**")
                                 .authenticated()

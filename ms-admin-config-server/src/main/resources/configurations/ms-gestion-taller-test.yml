@@ -1,0 +1,22 @@
+# ============================================================
+# Perfil TEST de ms-gestion-taller
+# H2 en memoria (MODE=MySQL), ddl-auto=create-drop, show-sql=true.
+# La BD se crea y se destruye con la aplicacion (ideal para pruebas).
+# Requiere la dependencia H2 en el pom (scope runtime).
+# ============================================================
+spring:
+  datasource:
+    url: "jdbc:h2:mem:db_taller;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true

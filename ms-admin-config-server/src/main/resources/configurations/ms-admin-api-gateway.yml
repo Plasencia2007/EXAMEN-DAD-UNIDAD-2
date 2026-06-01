@@ -12,3 +12,26 @@ spring:
           # Permite rutas automaticas por nombre de servicio en Eureka
           enabled: true
           lower-case-service-id: true
+
+# ============================================================
+# Swagger UI agregado del gateway
+# Un solo Swagger UI en http://localhost:8080/swagger-ui.html con un
+# desplegable para elegir la documentacion de cada microservicio.
+# Las URLs son relativas: el gateway enruta /<servicio>/v3/api-docs hacia
+# cada microservicio gracias al discovery locator (lower-case-service-id),
+# por lo que todo se sirve desde el mismo origen (sin problemas de CORS).
+# ============================================================
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    # No agrupar/ordenar automaticamente: respetamos el orden de la lista
+    urls-primary-name: ms-seguridad
+    urls:
+      - name: ms-seguridad
+        url: /ms-seguridad/v3/api-docs
+      - name: ms-gestion-instructor
+        url: /ms-gestion-instructor/v3/api-docs
+      - name: ms-gestion-alumno
+        url: /ms-gestion-alumno/v3/api-docs
+      - name: ms-gestion-taller
+        url: /ms-gestion-taller/v3/api-docs

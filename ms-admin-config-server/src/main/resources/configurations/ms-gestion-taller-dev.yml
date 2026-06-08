@@ -1,10 +1,4 @@
-# ============================================================
-# Perfil DEV de ms-gestion-taller
-# MySQL local (puerto 3307), show-sql=true, ddl-auto=update.
-# (equivale a la configuracion historica del servicio)
-# Se fusiona SOBRE ms-gestion-taller.yml (base comun) +
-# application.yml (Eureka + JWT compartidos).
-# ============================================================
+
 spring:
   datasource:
     url: "jdbc:mysql://localhost:3307/db_taller?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"

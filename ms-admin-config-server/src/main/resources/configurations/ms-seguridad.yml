@@ -1,7 +1,4 @@
-# ============================================================
-# Configuracion del microservicio de SEGURIDAD
-# (usuarios, roles, permisos, login/register y emision de JWT)
-# ============================================================
+
 server:
   port: 8084
 

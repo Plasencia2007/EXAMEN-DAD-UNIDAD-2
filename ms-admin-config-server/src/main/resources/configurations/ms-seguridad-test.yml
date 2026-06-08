@@ -1,8 +1,4 @@
-# ============================================================
-# Perfil TEST de ms-seguridad
-# H2 en memoria (MODE=MySQL), ddl-auto=create-drop, show-sql=true.
-# Requiere la dependencia H2 en el pom (scope runtime).
-# ============================================================
+
 spring:
   datasource:
     url: "jdbc:h2:mem:db_seguridad;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"

@@ -1,6 +1,4 @@
-# ============================================================
-# Configuracion del API GATEWAY
-# ============================================================
+
 server:
   port: 8080
 
@@ -9,22 +7,13 @@ spring:
     gateway:
       discovery:
         locator:
-          # Permite rutas automaticas por nombre de servicio en Eureka
           enabled: true
           lower-case-service-id: true
 
-# ============================================================
-# Swagger UI agregado del gateway
-# Un solo Swagger UI en http://localhost:8080/swagger-ui.html con un
-# desplegable para elegir la documentacion de cada microservicio.
-# Las URLs son relativas: el gateway enruta /<servicio>/v3/api-docs hacia
-# cada microservicio gracias al discovery locator (lower-case-service-id),
-# por lo que todo se sirve desde el mismo origen (sin problemas de CORS).
-# ============================================================
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    # No agrupar/ordenar automaticamente: respetamos el orden de la lista
     urls-primary-name: ms-seguridad
     urls:
       - name: ms-seguridad

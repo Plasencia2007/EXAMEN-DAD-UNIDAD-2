@@ -1,7 +1,4 @@
-# ============================================================
-# Perfil DEV de ms-gestion-alumno
-# MySQL local (puerto 3307), show-sql=true, ddl-auto=update.
-# ============================================================
+
 spring:
   datasource:
     url: "jdbc:mysql://localhost:3307/db_alumno?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false"

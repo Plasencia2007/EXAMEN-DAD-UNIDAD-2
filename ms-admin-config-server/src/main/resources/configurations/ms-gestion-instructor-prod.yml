@@ -1,9 +1,4 @@
-# ============================================================
-# Perfil PROD de ms-gestion-instructor
-# MySQL con credenciales por VARIABLES DE ENTORNO,
-# show-sql=false, ddl-auto=validate.
-#   DB_URL / DB_USER / DB_PASSWORD
-# ============================================================
+
 spring:
   datasource:
     url: ${DB_URL}

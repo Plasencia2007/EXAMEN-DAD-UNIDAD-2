@@ -1,11 +1,4 @@
-# ============================================================
-# Perfil PROD de ms-gestion-taller
-# MySQL con credenciales por VARIABLES DE ENTORNO,
-# show-sql=false, ddl-auto=validate (el esquema NO se modifica solo).
-#   DB_URL      -> jdbc:mysql://host:3306/db_taller?...
-#   DB_USER     -> usuario de BD
-#   DB_PASSWORD -> contrasena de BD
-# ============================================================
+
 spring:
   datasource:
     url: ${DB_URL}

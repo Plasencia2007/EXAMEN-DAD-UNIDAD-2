@@ -1,6 +1,4 @@
-# ============================================================
-# Configuracion del microservicio COMPUESTO de TALLERES
-# ============================================================
+
 server:
   port: 8083
 
@@ -22,29 +20,23 @@ spring:
     openfeign:
       client:
         config:
-          # Tiempos de espera (ms) para las llamadas Feign = patron Timeout
           default:
             connect-timeout: 3000
             read-timeout: 3000
 
-# ============================================================
-# RESILIENCIA (Resilience4j): Circuit Breaker + Retry
-# Aplica a las llamadas Feign de ms-gestion-taller hacia
-# instructor (instancia "instructor") y alumno (instancia "alumno").
-# ============================================================
 resilience4j:
   circuitbreaker:
     instances:
       instructor:
         sliding-window-type: COUNT_BASED
         sliding-window-size: 10
-        minimum-number-of-calls: 5          # minimo de llamadas antes de calcular la tasa de fallo
-        failure-rate-threshold: 50          # abre el circuito si fallan >= 50%
-        wait-duration-in-open-state: 10s    # tiempo abierto antes de pasar a half-open
+        minimum-number-of-calls: 5          
+        failure-rate-threshold: 50          
+        wait-duration-in-open-state: 10s   
         permitted-number-of-calls-in-half-open-state: 3
         automatic-transition-from-open-to-half-open-enabled: true
         register-health-indicator: true
-        ignore-exceptions:                  # un 404 NO debe abrir el circuito (no es fallo del servicio)
+        ignore-exceptions:                
           - feign.FeignException$NotFound
       alumno:
         sliding-window-type: COUNT_BASED
@@ -60,9 +52,9 @@ resilience4j:
   retry:
     instances:
       instructor:
-        max-attempts: 3                     # 1 intento + 2 reintentos
+        max-attempts: 3                    
         wait-duration: 500ms
-        retry-exceptions:                   # reintenta solo ante fallos transitorios / de red
+        retry-exceptions:                  
           - feign.RetryableException
           - feign.FeignException$InternalServerError
           - feign.FeignException$ServiceUnavailable
@@ -78,7 +70,6 @@ resilience4j:
         ignore-exceptions:
           - feign.FeignException$NotFound
 
-# Expone el estado de los circuit breakers para poder demostrarlo
 management:
   endpoints:
     web:

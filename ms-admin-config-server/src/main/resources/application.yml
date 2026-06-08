@@ -2,7 +2,6 @@ spring:
   application:
     name: ms-admin-config-server
   profiles:
-    # Perfil NATIVE: la configuracion se lee de archivos locales (sin Git)
     active: native
   cloud:
     config:
@@ -10,11 +9,9 @@ spring:
         native:
           search-locations: classpath:/configurations
 
-# Puerto estandar del Config Server
 server:
   port: 8888
 
-# El Config Server tambien se registra en Eureka
 eureka:
   client:
     service-url:

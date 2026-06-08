@@ -28,7 +28,6 @@ import java.util.List;
 @RequestMapping("/api/alumnos")
 @RequiredArgsConstructor
 @Tag(name = "Alumnos", description = "CRUD de alumnos")
-// Respuestas de error transversales a todos los endpoints del controlador.
 @ApiResponses({
         @ApiResponse(responseCode = "401", description = "No autenticado (falta o caduco el JWT)",
                 content = @Content),

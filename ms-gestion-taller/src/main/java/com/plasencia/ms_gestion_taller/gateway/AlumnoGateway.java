@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Envoltura resiliente del cliente Feign de alumnos.
- */
+
 @Component
 @RequiredArgsConstructor
 public class AlumnoGateway {
@@ -44,10 +42,7 @@ public class AlumnoGateway {
         return alumnoClient.obtenerAlumnosPorIds(ids);
     }
 
-    /**
-     * Fallback de la lista: si el servicio de alumnos no responde, la vista
-     * compuesta del taller se muestra sin la lista de alumnos (degradacion).
-     */
+  
     private List<AlumnoDTO> fallbackPorIds(List<Long> ids, Throwable causa) {
         return Collections.emptyList();
     }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 /**
- * Cliente OpenFeign hacia el microservicio de alumnos.
+ * Cliente OpenFeign hacia el microservicio de alumnos enonces si esto es la parte de como se maneja la comunicacion profeee.
  */
 @FeignClient(name = "ms-gestion-alumno", path = "/api/alumnos")
 public interface AlumnoClient {

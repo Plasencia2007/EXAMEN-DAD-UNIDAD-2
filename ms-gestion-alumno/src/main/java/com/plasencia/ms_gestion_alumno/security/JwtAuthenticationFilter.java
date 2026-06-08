@@ -16,10 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Lee el token "Bearer ..." y, si es valido, coloca la autenticacion con sus
- * roles/permisos en el contexto de seguridad de la peticion.
- */
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

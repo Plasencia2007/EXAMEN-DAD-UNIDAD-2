@@ -18,11 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.stream.Collectors;
 
-/**
- * Seguridad del microservicio de alumnos. Las lecturas (incluida /por-ids que
- * consume el microservicio de talleres) las puede hacer cualquier usuario
- * autenticado; las escrituras solo INSTRUCTOR o ADMIN.
- */
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -42,16 +38,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/alumnos/**").hasAnyRole("INSTRUCTOR", "ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
-                        // 401: no autenticado (sin token o token invalido/expirado)
                         .authenticationEntryPoint(puntoEntradaNoAutenticado())
-                        // 403: autenticado pero el rol no tiene permiso
                         .accessDeniedHandler(manejadorAccesoDenegado()))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    /** 401 con cuerpo JSON cuando falta el token o no es valido. */
     @Bean
     public AuthenticationEntryPoint puntoEntradaNoAutenticado() {
         return (request, response, authException) -> escribirJson(
@@ -62,7 +55,6 @@ public class SecurityConfig {
                 request.getRequestURI());
     }
 
-    /** 403 con cuerpo JSON que indica el rol del usuario y por que no tiene acceso. */
     @Bean
     public AccessDeniedHandler manejadorAccesoDenegado() {
         return (request, response, accessDeniedException) -> {
@@ -84,7 +76,6 @@ public class SecurityConfig {
         };
     }
 
-    /** Escribe la respuesta de error en el mismo formato que ManejadorGlobalExcepciones. */
     private void escribirJson(jakarta.servlet.http.HttpServletResponse response,
                               HttpStatus estado, String error, String mensaje, String ruta)
             throws java.io.IOException {

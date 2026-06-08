@@ -11,10 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Valida los tokens JWT emitidos por ms-seguridad usando el secreto compartido
- * (jwt.secret, entregado por el Config Server). Solo valida; no genera tokens.
- */
+
 @Component
 public class JwtUtil {
 
@@ -37,7 +34,6 @@ public class JwtUtil {
         return parse(token).getSubject();
     }
 
-    /** Junta los roles (ROLE_*) y permisos guardados en el token. */
     @SuppressWarnings("unchecked")
     public List<String> extraerAutoridades(String token) {
         Claims claims = parse(token);

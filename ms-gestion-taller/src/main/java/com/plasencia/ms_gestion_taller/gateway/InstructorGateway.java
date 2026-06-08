@@ -8,14 +8,6 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/**
- * Envoltura resiliente del cliente Feign de instructores.
- * <p>
- * Vive en un bean aparte (no en el service) para que los aspectos de
- * Resilience4j se apliquen via proxy: una auto-invocacion dentro del mismo
- * bean los saltaria. Las anotaciones corren en el HILO de la peticion, por lo
- * que el interceptor que propaga el JWT sigue funcionando.
- */
 @Component
 @RequiredArgsConstructor
 public class InstructorGateway {
